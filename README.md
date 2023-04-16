@@ -1,4 +1,44 @@
-# Getting Started with Create React App
+# Sample Reat App with proxy configured to be deployed to VERCEL
+
+Short summary how to implement proxy. Current implementation forwards all requests coming to **/api** location to an API gateway and adds **key** parameter to URL path:
+
+- install **http-proxy-middleware** as a project dependency (*npm install http-proxy-middleware*)
+- add **/api** to project folder with **index.js** in it 
+- in **/api/index.js** there are 2 variables **API_KEY** and **API_BASEPATH** created with values retrieved from **process.env**
+- in **/api/index.js** the following adds key parameter to path
+```
+onProxyReq(proxyReq) {
+    const targetURL = new URL(proxyReq.path, API_BASEPATH);
+    targetURL.searchParams.set('key', API_KEY);
+    proxyReq.path = targetURL.pathname + targetURL.search;
+}
+```
+
+- in project folder create **vercel.json** with the following content to redirect all API calls to /api/index.js:
+```
+{
+  "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    }
+  ]
+}
+```
+- go to VERCEL, create new project (or use existing) and add Environment Variables (under Settings) with respective values for **API_KEY** and **API_BASEPATH**
+- deploy your app to VERCEL
+
+- DONE!
+
+
+
+## Resources
+(https://mmazzarolo.com/blog/2022-02-05-creating-and-deploying-a-proxy-server-in-5-minutes/)
+(https://vercel.com/guides/using-express-with-vercel)
+
+
+
+
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
